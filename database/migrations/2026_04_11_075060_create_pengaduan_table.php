@@ -17,9 +17,9 @@ return new class extends Migration
             $table->integer('siswa_nis');
             $table->foreign('siswa_nis')->references('nis')->on('siswa')->cascadeOnDelete();
             $table->string('judul_laporan');
-            $table->string('isi_laporan');
+            $table->text('isi_laporan');
             $table->string('foto');
-            $table->string('status');
+            $table->enum('status', ['pending', 'proses', 'selesai'])->default('pending');
             $table->timestamps();
         });
     }

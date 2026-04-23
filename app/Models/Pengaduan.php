@@ -9,7 +9,15 @@ class Pengaduan extends Model
 {
     //
     protected $table = "pengaduan";
-    protected $fillable = ['kategori_id', 'siswa_nis', 'judul_laporan', 'isi_laporan', 'foto', 'status'];
+    protected $guarded = ['id'];
+    protected $fillable = [
+        'kategori_id', 
+        'siswa_nis', 
+        'judul_laporan', 
+        'isi_laporan', 
+        'foto', 
+        'status'
+    ];
 
     public function kategori(): BelongsTo {
         return $this->belongsTo(Kategori::class, 'kategori_id');

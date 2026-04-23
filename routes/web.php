@@ -7,7 +7,7 @@ use App\Http\Controllers\User\PengaduanController as UserPengaduan;
 
 // Halaman Depan (Landing Page)
 Route::get('/', function () {
-    return view('welcome');
+    return view('user.index');
 });
 
 // --- GROUP ROUTE UNTUK ADMIN ---
@@ -16,7 +16,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     
     // Dashboard Admin
     Route::get('/dashboard', function () {
-        return view('admin.dashboard');
+        return view('admin.index');
     })->name('dashboard');
 
     // CRUD Kategori (Index, Create, Store, Edit, Update, Delete)

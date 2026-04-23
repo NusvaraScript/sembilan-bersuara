@@ -11,5 +11,13 @@ class Siswa extends Model
     protected $primaryKey = 'nis';
     public $incrementing = false;
     protected $keyType = 'int';
-    protected $fillable = ['nis', 'nama_siswa', 'kelas', 'no_hp', 'password'];
+    protected $guarded = ['id'];
+    protected $fillable = [
+        'nis',
+        'username',
+        'nama_siswa',
+        'kelas',
+        'no_hp',
+        'password'
+    ];
 }
