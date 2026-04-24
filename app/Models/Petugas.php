@@ -8,6 +8,7 @@ class Petugas extends Model
 {
     //
     protected $table = "petugas";
+    protected $keyType = 'int';
     protected $guarded = ['id'];
     protected $fillable = [
         'username', 
@@ -15,4 +16,9 @@ class Petugas extends Model
         'level', 
         'password'
     ];
+
+    public function petugas()
+    {
+        return $this->hasMany(Pengaduan::class, 'petugas_id', 'id');
+    }
 }

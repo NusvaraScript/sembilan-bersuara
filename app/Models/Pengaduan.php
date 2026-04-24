@@ -9,6 +9,7 @@ class Pengaduan extends Model
 {
     //
     protected $table = "pengaduan";
+    protected $keyType = 'int';
     protected $guarded = ['id'];
     protected $fillable = [
         'kategori_id', 
@@ -25,5 +26,9 @@ class Pengaduan extends Model
 
     public function siswa(): BelongsTo {
         return $this->belongsTo(Siswa::class, 'siswa_nis', 'nis');
+    }
+
+    public function pengaduan() {
+        return $this->hasOne(Pengaduan::class,'pengaduan_id', 'id');
     }
 }

@@ -1,7 +1,8 @@
 @extends('layout.app')
-@section('title', '')
+@section('title', 'Beranda')
 @section('content')
+    <x-hero></x-hero>
     <x-section section="User">
-        <p>Ini adalah halaman user.</p>
+        
     </x-section>
 @endsection

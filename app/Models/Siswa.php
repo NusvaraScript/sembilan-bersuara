@@ -20,4 +20,9 @@ class Siswa extends Model
         'no_hp',
         'password'
     ];
+
+    public function siswa()
+    {
+        return $this->hasMany(Pengaduan::class, 'siswa_id', 'nis');
+    }
 }
