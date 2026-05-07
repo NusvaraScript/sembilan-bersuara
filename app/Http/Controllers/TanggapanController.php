@@ -11,97 +11,107 @@ use Illuminate\View\View;
 
 class TanggapanController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(): View
     {
-        $tanggapan = Tanggapan::with(['pengaduan', 'petugas'])
+        $tanggapan = Tanggapan::with(['pengaduan.siswa', 'petugas'])
             ->latest()
             ->paginate(10);
 
         return view('admin.tanggapan.index', compact('tanggapan'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create(): View
     {
-        $pengaduan = Pengaduan::orderBy('judul_laporan')->get();
+        $pengaduan = Pengaduan::with('siswa')
+            ->orderBy('judul_laporan')
+            ->get();
         $petugas = Petugas::orderBy('nama_petugas')->get();
 
         return view('admin.tanggapan.create', compact('pengaduan', 'petugas'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'pengaduan_id' => ['required', 'exists:pengaduan,id'],
-            'petugas_id' => ['required', 'exists:petugas,id'],
-            'isi_tanggapan' => ['required', 'string'],
-        ]);
+        $validated = $request->validate($this->rules());
 
         Tanggapan::create($validated);
-
-        Pengaduan::where('id', $validated['pengaduan_id'])
-            ->where('status', 'menunggu')
-            ->update(['status' => 'proses']);
+        $this->markPengaduanInProgress((int) $validated['pengaduan_id']);
 
         return redirect()
             ->route('admin.tanggapan.index')
             ->with('success', 'Tanggapan berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Tanggapan $tanggapan): RedirectResponse
+    public function show(Tanggapan $tanggapan): View
     {
-        return redirect()->route('admin.tanggapan.edit', $tanggapan);
+        $tanggapan->load(['pengaduan.siswa', 'pengaduan.kategori', 'petugas']);
+
+        return view('admin.tanggapan.show', compact('tanggapan'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Tanggapan $tanggapan): View
     {
-        $pengaduan = Pengaduan::orderBy('judul_laporan')->get();
+        $pengaduan = Pengaduan::with('siswa')
+            ->orderBy('judul_laporan')
+            ->get();
         $petugas = Petugas::orderBy('nama_petugas')->get();
 
         return view('admin.tanggapan.edit', compact('tanggapan', 'pengaduan', 'petugas'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Tanggapan $tanggapan): RedirectResponse
     {
-        $validated = $request->validate([
-            'pengaduan_id' => ['required', 'exists:pengaduan,id'],
-            'petugas_id' => ['required', 'exists:petugas,id'],
-            'isi_tanggapan' => ['required', 'string'],
-        ]);
+        $validated = $request->validate($this->rules());
+        $oldPengaduanId = $tanggapan->pengaduan_id;
 
         $tanggapan->update($validated);
+
+        $this->syncPengaduanStatus((int) $oldPengaduanId);
+        $this->markPengaduanInProgress((int) $validated['pengaduan_id']);
 
         return redirect()
             ->route('admin.tanggapan.index')
             ->with('success', 'Tanggapan berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Tanggapan $tanggapan): RedirectResponse
     {
+        $pengaduanId = $tanggapan->pengaduan_id;
+
         $tanggapan->delete();
+        $this->syncPengaduanStatus((int) $pengaduanId);
 
         return redirect()
             ->route('admin.tanggapan.index')
             ->with('success', 'Tanggapan berhasil dihapus.');
+    }
+
+    private function rules(): array
+    {
+        return [
+            'pengaduan_id' => ['required', 'exists:pengaduan,id'],
+            'petugas_id' => ['required', 'exists:petugas,id'],
+            'isi_tanggapan' => ['required', 'string', 'max:255'],
+        ];
+    }
+
+    private function markPengaduanInProgress(int $pengaduanId): void
+    {
+        Pengaduan::where('id', $pengaduanId)
+            ->where('status', 'pending')
+            ->update(['status' => 'proses']);
+    }
+
+    private function syncPengaduanStatus(int $pengaduanId): void
+    {
+        $pengaduan = Pengaduan::withCount('tanggapan')->find($pengaduanId);
+
+        if ($pengaduan === null || $pengaduan->status === 'selesai') {
+            return;
+        }
+
+        $pengaduan->update([
+            'status' => $pengaduan->tanggapan_count > 0 ? 'proses' : 'pending',
+        ]);
     }
 }

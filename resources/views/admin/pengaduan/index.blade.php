@@ -38,6 +38,7 @@
                                 <th>Kategori</th>
                                 <th>Judul Laporan</th>
                                 <th>Isi Laporan</th>
+                                <th>Jumlah Tanggapan</th>
                                 <th>Status</th>
                                 <th class="text-end">Aksi</th>
                             </tr>
@@ -45,11 +46,12 @@
                         <tbody>
                             @forelse ($pengaduans as $pengaduan)
                                 <tr>
-                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $pengaduans->firstItem() + $loop->index }}</td>
                                     <td>{{ $pengaduan->siswa->nama_siswa ?? '-' }}</td>
                                     <td>{{ $pengaduan->kategori->nama_kategori ?? '-' }}</td>
                                     <td>{{ $pengaduan->judul_laporan }}</td>
                                     <td>{{ \Illuminate\Support\Str::limit($pengaduan->isi_laporan, 80) }}</td>
+                                    <td>{{ $pengaduan->tanggapan->count() }}</td>
                                     <td>
                                         <span class="badge {{ $pengaduan->status === 'selesai' ? 'bg-success' : ($pengaduan->status === 'proses' ? 'bg-primary' : 'bg-warning') }}">
                                             {{ ucfirst($pengaduan->status) }}
@@ -57,6 +59,9 @@
                                     </td>
                                     <td>
                                         <div class="d-flex justify-content-end gap-2">
+                                            <a href="{{ route('admin.pengaduan.show', $pengaduan) }}" class="btn btn-sm btn-info">
+                                                <i class="bi bi-eye"></i> Detail
+                                            </a>
                                             <a href="{{ route('admin.pengaduan.edit', $pengaduan) }}" class="btn btn-sm btn-warning">
                                                 <i class="bi bi-pencil-square"></i> Edit
                                             </a>
@@ -72,11 +77,15 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="text-center text-muted">Belum ada data pengaduan.</td>
+                                    <td colspan="8" class="text-center text-muted">Belum ada data pengaduan.</td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+
+                <div class="mt-3">
+                    {{ $pengaduans->links() }}
                 </div>
             </div>
         </div>

@@ -1,5 +1,7 @@
 @extends('layout.admin')
 
+@section('title', 'Tambah Tanggapan')
+
 @section('content')
     <div class="page-title">
         <div class="row">
@@ -33,8 +35,8 @@
                         <select name="pengaduan_id" id="pengaduan_id" class="form-select @error('pengaduan_id') is-invalid @enderror" required>
                             <option value="">Pilih Pengaduan</option>
                             @foreach ($pengaduan as $item)
-                                <option value="{{ $item->id }}" @selected(old('pengaduan_id') == $item->id)>
-                                    {{ $item->judul_laporan }}
+                                <option value="{{ $item->id }}" @selected(old('pengaduan_id', request('pengaduan_id')) == $item->id)>
+                                    {{ $item->judul_laporan }} - {{ $item->siswa->nama_siswa ?? 'Tanpa siswa' }}
                                 </option>
                             @endforeach
                         </select>

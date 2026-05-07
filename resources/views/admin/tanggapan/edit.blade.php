@@ -1,5 +1,7 @@
 @extends('layout.admin')
 
+@section('title', 'Edit Tanggapan')
+
 @section('content')
     <div class="page-title">
         <div class="row">
@@ -35,7 +37,7 @@
                             <option value="">Pilih Pengaduan</option>
                             @foreach ($pengaduan as $item)
                                 <option value="{{ $item->id }}" @selected(old('pengaduan_id', $tanggapan->pengaduan_id) == $item->id)>
-                                    {{ $item->judul_laporan }}
+                                    {{ $item->judul_laporan }} - {{ $item->siswa->nama_siswa ?? 'Tanpa siswa' }}
                                 </option>
                             @endforeach
                         </select>
@@ -61,8 +63,6 @@
 
                     <div class="mb-3">
                         <label for="isi_tanggapan" class="form-label">Isi Tanggapan</label>
-                        <textarea name="isi_tanggapan" id="isi_tanggapan" rows="5" class="form-control @error('isi_tanggapan') is-invalid @enderror" required>{{ old('isi_tanggapan', $tanggapan->isi_tanggapan) }}</textarea>
-                        @error('isi_tanggapan')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>

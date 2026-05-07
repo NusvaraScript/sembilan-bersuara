@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\KategoriController;
 use App\Http\Controllers\Admin\PengaduanController as AdminPengaduanController;
+use App\Http\Controllers\TanggapanController;
 use App\Http\Controllers\User\PengaduanController as UserPengaduan;
 use App\Models\Pengaduan;
 use App\Models\Tanggapan;

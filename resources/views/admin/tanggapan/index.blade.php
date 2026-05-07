@@ -1,5 +1,7 @@
 @extends('layout.admin')
 
+@section('title', 'Data Tanggapan')
+
 @section('content')
     <div class="page-title">
         <div class="row">
@@ -40,6 +42,7 @@
                             <tr>
                                 <th>No</th>
                                 <th>Judul Pengaduan</th>
+                                <th>Nama Siswa</th>
                                 <th>Nama Petugas</th>
                                 <th>Isi Tanggapan</th>
                                 <th>Tanggal Dibuat</th>
@@ -51,10 +54,14 @@
                                 <tr>
                                     <td>{{ $tanggapan->firstItem() + $loop->index }}</td>
                                     <td>{{ $item->pengaduan->judul_laporan ?? '-' }}</td>
+                                    <td>{{ $item->pengaduan->siswa->nama_siswa ?? '-' }}</td>
                                     <td>{{ $item->petugas->nama_petugas ?? '-' }}</td>
-                                    <td>{{ $item->isi_tanggapan }}</td>
+                                    <td>{{ \Illuminate\Support\Str::limit($item->isi_tanggapan, 80) }}</td>
                                     <td>{{ $item->created_at?->format('d-m-Y H:i') ?? '-' }}</td>
                                     <td class="text-center">
+                                        <a href="{{ route('admin.tanggapan.show', $item) }}" class="btn btn-sm btn-info">
+                                            <i class="bi bi-eye"></i> Detail
+                                        </a>
                                         <a href="{{ route('admin.tanggapan.edit', $item) }}" class="btn btn-sm btn-warning">
                                             <i class="bi bi-pencil-square"></i> Edit
                                         </a>
@@ -69,7 +76,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center">Belum ada data tanggapan.</td>
+                                    <td colspan="7" class="text-center">Belum ada data tanggapan.</td>
                                 </tr>
                             @endforelse
                         </tbody>
