@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('nama_siswa');
             $table->string('username')->unique();
             $table->string('kelas');
-            $table->integer('no_hp');
+            $table->bigInteger('no_hp')->unsigned();
             $table->string('password');
             $table->timestamps();
         });

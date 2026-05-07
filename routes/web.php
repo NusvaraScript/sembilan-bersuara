@@ -50,4 +50,8 @@ Route::get('/', function () {
 Route::resource('/admin/pengaduan', AdminPengaduanController::class)->names('admin.pengaduan');
 Route::resource('/admin/tanggapan', TanggapanController::class)->names('admin.tanggapan');
 Route::get('/admin/siswa', [SiswaController::class, 'index'])->name('admin.siswa.index');
+Route::get('/admin/siswa/export', [SiswaController::class, 'export'])->name('admin.siswa.export');
+Route::get('/admin/siswa/template', [SiswaController::class, 'template'])->name('admin.siswa.template');
+Route::post('/admin/siswa/import', [SiswaController::class, 'import'])->name('admin.siswa.import');
 Route::get('/admin/petugas', [PetugasController::class, 'index'])->name('admin.petugas.index');
+Route::post('/admin/petugas', [PetugasController::class, 'store'])->name('admin.petugas.store');
