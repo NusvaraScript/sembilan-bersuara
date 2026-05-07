@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layout.app')
 
 @section('title', 'Dashboard Utama')
 
@@ -19,7 +19,6 @@
             </div>
             <div class="card-body">
                 Isi dari halaman dashboard Anda letakkan di sini.
-                (Anda bisa menaruh komponen Livewire <x-molecules.stat-card> Anda di sini).
             </div>
         </div>
     </section>
