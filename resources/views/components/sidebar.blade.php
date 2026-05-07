@@ -42,7 +42,7 @@
 
                 <!-- Tanggapan -->
                 <li class="sidebar-item">
-                    <a href="tanggapan.html" class="sidebar-link">
+                    <a href="{{ route('admin.tanggapan.index') }}" class="sidebar-link">
                         <i class="bi bi-reply-fill"></i>
                         <span>Tanggapan</span>
                     </a>
@@ -67,10 +67,10 @@
                 </li>
 
                 <li class="sidebar-title">Akun</li>
-
+        
                 <!-- Logout -->
                 <li class="sidebar-item">
-                    <a href="logout.html" class="sidebar-link">
+                    <a href="#" class="sidebar-link">
                         <i class="bi bi-box-arrow-right"></i>
                         <span>Logout</span>
                     </a>

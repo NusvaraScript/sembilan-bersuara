@@ -1,38 +1,45 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\Pengaduan;
-use App\Models\Tanggapan;
+use App\Models\Petugas;
 use App\Models\Siswa;
-use App\Models\User;
-use Illuminate\Http\Request;
+use App\Models\Tanggapan;
+use Illuminate\Support\Carbon;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // ── Stats 4 kartu ──────────────────────────────────────
+        $statusMenunggu = ['pending', 'menunggu', '0'];
+        $today = Carbon::today();
+
         $totalPengaduan = Pengaduan::count();
         $totalTanggapan = Tanggapan::count();
-        $totalSiswa     = Siswa::count();
-        $totalPetugas   = User::where('level', 'petugas')->count();
+        $totalSiswa = Siswa::count();
+        $totalPetugas = Petugas::count();
 
-        // ── Status penanganan ──────────────────────────────────
-        // Sesuaikan value status dengan yang ada di DB-mu
-        $menunggu = Pengaduan::where('status', 'menunggu')
-                             ->orWhere('status', '0')
-                             ->count();
-
+        $menunggu = Pengaduan::whereIn('status', $statusMenunggu)->count();
         $diproses = Pengaduan::where('status', 'proses')->count();
+        $selesai = Pengaduan::where('status', 'selesai')->count();
 
-        $selesai  = Pengaduan::where('status', 'selesai')->count();
+        $pengaduanHariIni = Pengaduan::whereDate('created_at', $today)->count();
+        $belumDitanggapi = Pengaduan::whereDoesntHave('tanggapan')->count();
+        $petugasAktif = Tanggapan::whereDate('created_at', $today)
+            ->distinct('petugas_id')
+            ->count('petugas_id');
 
-        // ── Pengaduan terbaru (5 data) ─────────────────────────
-        $pengaduanTerbaru = Pengaduan::with('siswa')   // eager load relasi
-                                     ->latest()
-                                     ->limit(5)
-                                     ->get();
+        $pengaduanTerbaru = Pengaduan::with(['siswa', 'kategori'])
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        $aktivitasPetugas = Tanggapan::with(['petugas', 'pengaduan'])
+            ->latest()
+            ->limit(5)
+            ->get();
 
         return view('admin.index', compact(
             'totalPengaduan',
@@ -42,7 +49,11 @@ class DashboardController extends Controller
             'menunggu',
             'diproses',
             'selesai',
-            'pengaduanTerbaru'
+            'pengaduanHariIni',
+            'belumDitanggapi',
+            'petugasAktif',
+            'pengaduanTerbaru',
+            'aktivitasPetugas'
         ));
     }
 }
