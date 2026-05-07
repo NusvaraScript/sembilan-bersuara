@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\KategoriController;
 use App\Http\Controllers\Admin\PengaduanController as AdminPengaduanController;
 use App\Http\Controllers\TanggapanController;
+use App\Http\Controllers\SiswaController;
+use App\Http\Controllers\PetugasController;
 use App\Http\Controllers\User\PengaduanController as UserPengaduan;
 use App\Models\Pengaduan;
 use App\Models\Tanggapan;
@@ -38,7 +40,7 @@ Route::get('/', function () {
         'diproses',
         'selesai',
         'pengaduanTerbaru',
-        'aktivitasPetugas',
+        'aktivitasPetugas', 
         'pengaduanHariIni',
         'belumDitanggapi',
         'petugasAktif'
@@ -47,3 +49,5 @@ Route::get('/', function () {
 
 Route::resource('/admin/pengaduan', AdminPengaduanController::class)->names('admin.pengaduan');
 Route::resource('/admin/tanggapan', TanggapanController::class)->names('admin.tanggapan');
+Route::get('/admin/siswa', [SiswaController::class, 'index'])->name('admin.siswa.index');
+Route::get('/admin/petugas', [PetugasController::class, 'index'])->name('admin.petugas.index');

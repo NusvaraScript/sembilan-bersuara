@@ -43,15 +43,15 @@
 
                 <li class="sidebar-title">Manajemen User</li>
 
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
+                <li class="sidebar-item {{ request()->routeIs('admin.siswa.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.siswa.index') }}" class="sidebar-link">
                         <i class="bi bi-people-fill"></i>
                         <span>Daftar Siswa</span>
                     </a>
                 </li>
 
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
+                <li class="sidebar-item {{ request()->routeIs('admin.petugas.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.petugas.index') }}" class="sidebar-link">
                         <i class="bi bi-person-badge-fill"></i>
                         <span>Daftar Petugas</span>
                     </a>
