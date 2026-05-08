@@ -1,75 +1,56 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Admin\KategoriController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PengaduanController as AdminPengaduanController;
-use App\Http\Controllers\TanggapanController;
-use App\Http\Controllers\SiswaController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PetugasController;
-use App\Http\Controllers\User\PengaduanController as UserPengaduan;
+use App\Http\Controllers\SiswaController;
+use App\Http\Controllers\TanggapanController;
+use App\Http\Controllers\User\PengaduanController as UserPengaduanController;
+use App\Models\Kategori;
 use App\Models\Pengaduan;
-use App\Models\Tanggapan;
-use App\Models\Siswa;
 use App\Models\Petugas;
-use Carbon\Carbon;
+use App\Models\Siswa;
+use App\Models\Tanggapan;
+use Illuminate\Support\Facades\Route;
 
-// Halaman Depan (Landing Page)
-Route::get('/', function (Request $request) {
-    $totalPengaduan = Pengaduan::count();
-    $totalTanggapan = Tanggapan::count();
-    $totalSiswa = Siswa::count();
-    $totalPetugas = Petugas::count();
+Route::get('/', function () {
+    return view('user.index', [
+        'totalPengaduan' => Pengaduan::count(),
+        'totalSelesai' => Pengaduan::where('status', 'selesai')->count(),
+        'totalDiproses' => Pengaduan::where('status', 'proses')->count(),
+        'totalSiswa' => Siswa::count(),
+        'totalPetugas' => Petugas::count(),
+        'totalTanggapan' => Tanggapan::count(),
+        'kategoris' => Kategori::orderBy('nama_kategori')->get(),
+    ]);
+})->name('home');
 
-    $menunggu = Pengaduan::where('status', 'pending')->count();
-    $diproses = Pengaduan::where('status', 'proses')->count();
-    $selesai = Pengaduan::where('status', 'selesai')->count();
+Route::post('/pengaduan', [UserPengaduanController::class, 'store'])->name('user.pengaduan.store');
+Route::get('/pengaduan/status', [UserPengaduanController::class, 'status'])->name('user.pengaduan.status');
 
-    $search = $request->string('search')->trim()->toString();
-
-    $pengaduanTerbaru = Pengaduan::with('siswa')
-        ->when($search !== '', function ($query) use ($search): void {
-            $query->where(function ($query) use ($search): void {
-                $query->where('judul_laporan', 'like', "%{$search}%")
-                    ->orWhere('isi_laporan', 'like', "%{$search}%")
-                    ->orWhere('status', 'like', "%{$search}%")
-                    ->orWhereHas('siswa', function ($query) use ($search): void {
-                        $query->where('nama_siswa', 'like', "%{$search}%")
-                            ->orWhere('nis', 'like', "%{$search}%");
-                    });
-            });
-        })
-        ->latest()
-        ->take(5)
-        ->get();
-    $aktivitasPetugas = Tanggapan::with('petugas', 'pengaduan')->latest()->take(5)->get();
-
-    $pengaduanHariIni = Pengaduan::whereDate('created_at', Carbon::today())->count();
-    $belumDitanggapi = Pengaduan::whereDoesntHave('tanggapan')->count();
-    $petugasAktif = Tanggapan::whereDate('created_at', Carbon::today())->distinct()->count('petugas_id');
-
-    return view('admin.index', compact(
-        'totalPengaduan',
-        'totalTanggapan',
-        'totalSiswa',
-        'totalPetugas',
-        'search',
-        'menunggu',
-        'diproses',
-        'selesai',
-        'pengaduanTerbaru',
-        'aktivitasPetugas', 
-        'pengaduanHariIni',
-        'belumDitanggapi',
-        'petugasAktif'
-    ));
+Route::middleware('guest')->group(function (): void {
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
 });
 
-Route::resource('/admin/pengaduan', AdminPengaduanController::class)->names('admin.pengaduan');
-Route::resource('/admin/tanggapan', TanggapanController::class)->names('admin.tanggapan');
-Route::get('/admin/siswa', [SiswaController::class, 'index'])->name('admin.siswa.index');
-Route::get('/admin/siswa/export', [SiswaController::class, 'export'])->name('admin.siswa.export');
-Route::get('/admin/siswa/template', [SiswaController::class, 'template'])->name('admin.siswa.template');
-Route::post('/admin/siswa/import', [SiswaController::class, 'import'])->name('admin.siswa.import');
-Route::get('/admin/petugas', [PetugasController::class, 'index'])->name('admin.petugas.index');
-Route::post('/admin/petugas', [PetugasController::class, 'store'])->name('admin.petugas.store');
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
+
+Route::middleware('auth')->prefix('admin')->name('admin.')->group(function (): void {
+    Route::redirect('/', '/admin/dashboard')->name('home');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::resource('pengaduan', AdminPengaduanController::class);
+    Route::resource('tanggapan', TanggapanController::class);
+
+    Route::middleware('role:admin')->group(function (): void {
+        Route::get('/siswa', [SiswaController::class, 'index'])->name('siswa.index');
+        Route::get('/siswa/export', [SiswaController::class, 'export'])->name('siswa.export');
+        Route::get('/siswa/template', [SiswaController::class, 'template'])->name('siswa.template');
+        Route::post('/siswa/import', [SiswaController::class, 'import'])->name('siswa.import');
+
+        Route::get('/petugas', [PetugasController::class, 'index'])->name('petugas.index');
+        Route::post('/petugas', [PetugasController::class, 'store'])->name('petugas.store');
+        Route::put('/petugas/{petugas}', [PetugasController::class, 'update'])->name('petugas.update');
+    });
+});

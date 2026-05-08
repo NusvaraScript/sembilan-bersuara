@@ -36,8 +36,8 @@
             <ul class="menu">
                 <li class="sidebar-title">Menu Utama</li>
 
-                <li class="sidebar-item {{ request()->is('/') ? 'active' : '' }}">
-                    <a href="{{ url('/') }}" class="sidebar-link">
+                <li class="sidebar-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                    <a href="{{ route('admin.dashboard') }}" class="sidebar-link">
                         <i class="bi bi-grid-fill"></i>
                         <span>Dashboard</span>
                     </a>
@@ -60,30 +60,35 @@
                     </ul>
                 </li>
 
-                <li class="sidebar-title">Manajemen User</li>
+                @if (auth()->user()?->level === 'admin')
+                    <li class="sidebar-title">Manajemen User</li>
 
-                <li class="sidebar-item has-sub {{ request()->routeIs('admin.siswa.*') || request()->routeIs('admin.petugas.*') ? 'active' : '' }}">
-                    <a href="#" class="sidebar-link">
-                        <i class="bi bi-people-fill"></i>
-                        <span>Pengguna Sistem</span>
-                    </a>
-                    <ul class="submenu {{ request()->routeIs('admin.siswa.*') || request()->routeIs('admin.petugas.*') ? 'active' : '' }}">
-                        <li class="submenu-item {{ request()->routeIs('admin.siswa.*') ? 'active' : '' }}">
-                            <a href="{{ route('admin.siswa.index') }}">Daftar Siswa</a>
-                        </li>
-                        <li class="submenu-item {{ request()->routeIs('admin.petugas.*') ? 'active' : '' }}">
-                            <a href="{{ route('admin.petugas.index') }}">Daftar Petugas</a>
-                        </li>
-                    </ul>
-                </li>
+                    <li class="sidebar-item has-sub {{ request()->routeIs('admin.siswa.*') || request()->routeIs('admin.petugas.*') ? 'active' : '' }}">
+                        <a href="#" class="sidebar-link">
+                            <i class="bi bi-people-fill"></i>
+                            <span>Pengguna Sistem</span>
+                        </a>
+                        <ul class="submenu {{ request()->routeIs('admin.siswa.*') || request()->routeIs('admin.petugas.*') ? 'active' : '' }}">
+                            <li class="submenu-item {{ request()->routeIs('admin.siswa.*') ? 'active' : '' }}">
+                                <a href="{{ route('admin.siswa.index') }}">Daftar Siswa</a>
+                            </li>
+                            <li class="submenu-item {{ request()->routeIs('admin.petugas.*') ? 'active' : '' }}">
+                                <a href="{{ route('admin.petugas.index') }}">Daftar Petugas</a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
 
                 <li class="sidebar-title">Akun</li>
 
                 <li class="sidebar-item">
-                    <a href="#" class="sidebar-link text-danger">
-                        <i class="bi bi-box-arrow-left text-danger"></i>
-                        <span>Logout</span>
-                    </a>
+                    <form action="{{ route('logout') }}" method="POST" class="m-0">
+                        @csrf
+                        <button type="submit" class="sidebar-link text-danger border-0 bg-transparent w-100 text-start">
+                            <i class="bi bi-box-arrow-left text-danger"></i>
+                            <span>Logout</span>
+                        </button>
+                    </form>
                 </li>
             </ul>
         </div>

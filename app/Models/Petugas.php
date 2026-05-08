@@ -20,6 +20,11 @@ class Petugas extends Authenticatable
         'password',
     ];
 
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
     public function petugas(): HasMany
     {
         return $this->tanggapan();
