@@ -8,10 +8,12 @@ use App\Models\Petugas;
 use App\Models\Siswa;
 use App\Models\Tanggapan;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(): View
     {
         $statusMenunggu = ['pending', 'menunggu', '0'];
         $today = Carbon::today();
@@ -41,7 +43,9 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        return view('admin.index', compact(
+        $view = Auth::user()?->level === 'petugas' ? 'petugas.index' : 'admin.index';
+
+        return view($view, compact(
             'totalPengaduan',
             'totalTanggapan',
             'totalSiswa',

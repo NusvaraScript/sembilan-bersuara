@@ -22,7 +22,7 @@
                     <h1 class="auth-title">Log in.</h1>
                     <p class="auth-subtitle mb-5">Masuk dengan data yang anda daftarkan.</p>
 
-                    <form action="{{ url('login') }}" method="POST">
+                    <form action="{{ route('login.attempt') }}" method="POST">
                         @csrf
                         
                         @if($errors->any())
@@ -46,6 +46,10 @@
                             <div class="form-control-icon">
                                 <i class="bi bi-shield-lock"></i>
                             </div>
+                        </div>
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" name="remember" id="remember">
+                            <label class="form-check-label" for="remember">Ingat saya</label>
                         </div>
                         <button type="submit" class="btn btn-primary btn-block btn-lg shadow-lg mt-5">Log in</button>
                     </form>
