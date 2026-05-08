@@ -63,6 +63,8 @@
 
                     <div class="mb-3">
                         <label for="isi_tanggapan" class="form-label">Isi Tanggapan</label>
+                        <textarea name="isi_tanggapan" id="isi_tanggapan" class="form-control @error('isi_tanggapan') is-invalid @enderror" rows="5" required>{{ old('isi_tanggapan', $tanggapan->isi_tanggapan) }}</textarea>
+                        @error('isi_tanggapan')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>

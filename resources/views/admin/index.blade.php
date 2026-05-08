@@ -30,7 +30,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="stats-icon purple">
-                                        <i class="bi bi-chat-left-text-fill"></i>
+                                        <i class="bi bi-chat-left-text-fill" style="width: auto; height: auto;"></i>
                                     </div>
                                 </div>
                                 <div class="col-md-8">
@@ -48,7 +48,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="stats-icon blue">
-                                        <i class="bi bi-reply-fill"></i>
+                                        <i class="bi bi-reply-fill" style="width: auto; height: auto;"></i>
                                     </div>
                                 </div>
                                 <div class="col-md-8">
@@ -66,7 +66,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="stats-icon green">
-                                        <i class="bi bi-people-fill"></i>
+                                        <i class="bi bi-people-fill" style="width: auto; height: auto;"></i>
                                     </div>
                                 </div>
                                 <div class="col-md-8">
@@ -84,7 +84,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="stats-icon red">
-                                        <i class="bi bi-person-badge-fill"></i>
+                                        <i class="bi bi-person-badge-fill" style="width: auto; height: auto;"></i>
                                     </div>
                                 </div>
                                 <div class="col-md-8">
@@ -136,6 +136,12 @@
                             <h4>Pengaduan Terbaru</h4>
                         </div>
                         <div class="card-body">
+                        @include('components.table-search', [
+                                'searchAction' => url('/'),
+                                'searchValue' => $search ?? '',
+                                'searchPlaceholder' => 'Cari nama siswa, judul, isi pengaduan, atau status...',
+                            ])
+
                             <div class="table-responsive">
                                 <table class="table table-hover table-lg">
                                     <thead>

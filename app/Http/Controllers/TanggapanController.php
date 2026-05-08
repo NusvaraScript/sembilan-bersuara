@@ -11,13 +11,32 @@ use Illuminate\View\View;
 
 class TanggapanController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $tanggapan = Tanggapan::with(['pengaduan.siswa', 'petugas'])
-            ->latest()
-            ->paginate(10);
+        $search = $request->string('search')->trim()->toString();
 
-        return view('admin.tanggapan.index', compact('tanggapan'));
+        $tanggapan = Tanggapan::with(['pengaduan.siswa', 'petugas'])
+            ->when($search !== '', function ($query) use ($search): void {
+                $query->where(function ($query) use ($search): void {
+                    $query->where('isi_tanggapan', 'like', "%{$search}%")
+                        ->orWhereHas('pengaduan', function ($query) use ($search): void {
+                            $query->where('judul_laporan', 'like', "%{$search}%")
+                                ->orWhereHas('siswa', function ($query) use ($search): void {
+                                    $query->where('nama_siswa', 'like', "%{$search}%")
+                                        ->orWhere('nis', 'like', "%{$search}%");
+                                });
+                        })
+                        ->orWhereHas('petugas', function ($query) use ($search): void {
+                            $query->where('nama_petugas', 'like', "%{$search}%")
+                                ->orWhere('username', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('admin.tanggapan.index', compact('tanggapan', 'search'));
     }
 
     public function create(): View

@@ -74,6 +74,12 @@
                 <h4 class="card-title">Data Siswa</h4>
             </div>
             <div class="card-body">
+            @include('components.table-search', [
+                    'searchAction' => route('admin.siswa.index'),
+                    'searchValue' => $search ?? '',
+                    'searchPlaceholder' => 'Cari NIS, nama siswa, username, kelas, atau no. HP...',
+                ])
+
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead>

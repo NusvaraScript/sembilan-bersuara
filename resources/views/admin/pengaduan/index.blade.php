@@ -29,6 +29,12 @@
                 <h4 class="card-title">Daftar Pengaduan</h4>
             </div>
             <div class="card-body">
+            @include('components.table-search', [
+                    'searchAction' => route('admin.pengaduan.index'),
+                    'searchValue' => $search ?? '',
+                    'searchPlaceholder' => 'Cari nama siswa, kategori, judul, isi laporan, atau status...',
+                ])
+
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead>

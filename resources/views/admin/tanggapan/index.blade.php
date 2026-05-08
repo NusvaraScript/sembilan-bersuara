@@ -35,6 +35,12 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
+                
+                @include('components.table-search', [
+                    'searchAction' => route('admin.tanggapan.index'),
+                    'searchValue' => $search ?? '',
+                    'searchPlaceholder' => 'Cari judul pengaduan, nama siswa, petugas, atau isi tanggapan...',
+                ])
 
                 <div class="table-responsive">
                     <table class="table table-striped align-middle">

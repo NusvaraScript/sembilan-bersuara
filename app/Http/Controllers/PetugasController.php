@@ -10,12 +10,23 @@ use Illuminate\View\View;
 
 class PetugasController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $petugas = Petugas::orderBy('nama_petugas')
-            ->paginate(10);
+        $search = $request->string('search')->trim()->toString();
 
-        return view('admin.petugas.index', compact('petugas'));
+        $petugas = Petugas::withCount('tanggapan')
+            ->when($search !== '', function ($query) use ($search): void {
+                $query->where(function ($query) use ($search): void {
+                    $query->where('nama_petugas', 'like', "%{$search}%")
+                        ->orWhere('username', 'like', "%{$search}%")
+                        ->orWhere('level', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('nama_petugas')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('admin.petugas.index', compact('petugas', 'search'));
     }
 
     public function store(Request $request): RedirectResponse

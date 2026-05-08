@@ -100,6 +100,12 @@
                 <h4 class="card-title">Data Petugas</h4>
             </div>
             <div class="card-body">
+            @include('components.table-search', [
+                    'searchAction' => route('admin.petugas.index'),
+                    'searchValue' => $search ?? '',
+                    'searchPlaceholder' => 'Cari nama petugas, username, atau level...',
+                ])
+
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead>

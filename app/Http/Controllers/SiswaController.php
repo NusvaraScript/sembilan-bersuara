@@ -15,13 +15,25 @@ class SiswaController extends Controller
 {
     private const CSV_HEADERS = ['nis', 'nama_siswa', 'username', 'kelas', 'no_hp', 'password'];
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $siswas = Siswa::withCount('pengaduan')
-            ->orderBy('nama_siswa')
-            ->paginate(10);
+        $search = $request->string('search')->trim()->toString();
 
-        return view('admin.siswa.index', compact('siswas'));
+        $siswas = Siswa::withCount('pengaduan')
+            ->when($search !== '', function ($query) use ($search): void {
+                $query->where(function ($query) use ($search): void {
+                    $query->where('nis', 'like', "%{$search}%")
+                        ->orWhere('nama_siswa', 'like', "%{$search}%")
+                        ->orWhere('username', 'like', "%{$search}%")
+                        ->orWhere('kelas', 'like', "%{$search}%")
+                        ->orWhere('no_hp', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('nama_siswa')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('admin.siswa.index', compact('siswas', 'search'));
     }
 
     public function export(): StreamedResponse

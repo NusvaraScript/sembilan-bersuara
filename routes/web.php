@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Admin\KategoriController;
 use App\Http\Controllers\Admin\PengaduanController as AdminPengaduanController;
 use App\Http\Controllers\TanggapanController;
@@ -14,7 +15,7 @@ use App\Models\Petugas;
 use Carbon\Carbon;
 
 // Halaman Depan (Landing Page)
-Route::get('/', function () {
+Route::get('/', function (Request $request) {
     $totalPengaduan = Pengaduan::count();
     $totalTanggapan = Tanggapan::count();
     $totalSiswa = Siswa::count();
@@ -24,7 +25,23 @@ Route::get('/', function () {
     $diproses = Pengaduan::where('status', 'proses')->count();
     $selesai = Pengaduan::where('status', 'selesai')->count();
 
-    $pengaduanTerbaru = Pengaduan::with('siswa')->latest()->take(5)->get();
+    $search = $request->string('search')->trim()->toString();
+
+    $pengaduanTerbaru = Pengaduan::with('siswa')
+        ->when($search !== '', function ($query) use ($search): void {
+            $query->where(function ($query) use ($search): void {
+                $query->where('judul_laporan', 'like', "%{$search}%")
+                    ->orWhere('isi_laporan', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%")
+                    ->orWhereHas('siswa', function ($query) use ($search): void {
+                        $query->where('nama_siswa', 'like', "%{$search}%")
+                            ->orWhere('nis', 'like', "%{$search}%");
+                    });
+            });
+        })
+        ->latest()
+        ->take(5)
+        ->get();
     $aktivitasPetugas = Tanggapan::with('petugas', 'pengaduan')->latest()->take(5)->get();
 
     $pengaduanHariIni = Pengaduan::whereDate('created_at', Carbon::today())->count();
@@ -36,6 +53,7 @@ Route::get('/', function () {
         'totalTanggapan',
         'totalSiswa',
         'totalPetugas',
+        'search',
         'menunggu',
         'diproses',
         'selesai',
